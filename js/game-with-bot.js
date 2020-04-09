@@ -1,14 +1,17 @@
 const options = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const gameLimit = 25;
-const users = ["Andre", "Alexa"];
+const users = ["Andre", "Alexa The Bot"];
 
 const getDefaultGameState = () => ({
   currentTurn: null,
   total: null,
   gameLimit: gameLimit,
   allOptions: options,
+  availibleOptions: options,
+  usedOptions: [],
   history: [],
+  gameIsOver: false,
 });
 
 let gameState;
@@ -59,6 +62,12 @@ const checkGameOver = () => {
   const user = users[gameState.currentTurn];
 
   if (total > gameState.gameLimit) {
+    const newGameState = {
+      ...gameState,
+      gameIsOver: true,
+    };
+    gameState = newGameState;
+
     gameElements.options.map((option) => option.setAttribute("disabled", true));
     gameElements.turnHistoryElement.innerHTML =
       gameElements.turnHistoryElement.innerHTML +
@@ -66,17 +75,40 @@ const checkGameOver = () => {
   }
 };
 
+const getRandomArrayEl = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+const botMakeDecision = () => {
+  const valueToReachGameLimit = gameState.gameLimit - gameState.total;
+  if (gameState.availibleOptions.includes(valueToReachGameLimit))
+    return valueToReachGameLimit;
+  return getRandomArrayEl(gameState.availibleOptions);
+};
+
+const botMakeTurn = () => {
+  setTimeout(2000);
+  makeTurn(botMakeDecision());
+};
+
 const makeTurn = (option) => {
   const user = users[gameState.currentTurn];
+
   const newGameState = {
     ...gameState,
     currentTurn: (gameState.currentTurn + 1) % 2,
     total: gameState.total + option,
     history: updateHistory(user, option),
+    availibleOptions: gameState.availibleOptions.filter(
+      (item) => item !== option
+    ),
   };
   gameState = newGameState;
   render();
   checkGameOver();
+  if (user === "Alexa The Bot") {
+    return;
+  }
+  if (gameState.gameIsOver) return;
+  botMakeTurn();
 };
 
 const onOptionClick = (option, element) => {
