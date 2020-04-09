@@ -54,7 +54,7 @@ const checkGameOver = () => {
   const total = gameState.total;
   const user = users[gameState.currentTurn];
 
-  if (total >= gameState.gameLimit) {
+  if (total > gameState.gameLimit) {
     gameElements.options.map(option => option.setAttribute('disabled', true));
     gameElements.turnHistoryElement.innerHTML = gameElements.turnHistoryElement.innerHTML + `<div class="alert alert-success"> Game is won by ${user} </div>`;
   }
